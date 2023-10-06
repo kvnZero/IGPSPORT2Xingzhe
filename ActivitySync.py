@@ -1,5 +1,6 @@
 import base64
-from datetime import datetime, ZoneInfo
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import os
 import requests, json
 from Crypto.PublicKey import RSA
