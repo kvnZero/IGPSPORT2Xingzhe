@@ -1,5 +1,5 @@
 import base64
-import time
+from datetime import datetime, ZoneInfo
 import os
 import requests, json
 from Crypto.PublicKey import RSA
@@ -66,8 +66,10 @@ def syncData(username, password):
     sync_data = []
     # get not upload activity
     for activity in activities:
-        s_time  = time.strptime(activity["StartTime"], "%Y-%m-%d %H:%M:%S")
-        mk_time = int(time.mktime(s_time)) * 1000
+        timezone = ZoneInfo('Asia/Shanghai')
+        datetime.tzinfo = timezone
+        s_time  = datetime.timestamp(datetime.strptime(activity["StartTime"], "%Y-%m-%d %H:%M:%S"))
+        mk_time = int(s_time) * 1000
         need_sync = True
         for item in data:
             print(item["start_time"], mk_time)
