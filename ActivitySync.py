@@ -68,8 +68,10 @@ def syncData(username, password):
     # get not upload activity
     for activity in activities:
         timezone = ZoneInfo('Asia/Shanghai')
-        datetime.tzinfo = timezone
-        s_time  = datetime.timestamp(datetime.strptime(activity["StartTime"], "%Y-%m-%d %H:%M:%S"))
+        dt = datetime.strptime(activity["StartTime"], "%Y-%m-%d %H:%M:%S")
+        dt.tzinfo = timezone
+        s_time  = datetime.timestamp(dt)
+        
         mk_time = int(s_time) * 1000
         need_sync = True
         for item in data:
