@@ -69,8 +69,8 @@ def syncData(username, password):
     for activity in activities:
         timezone = ZoneInfo('Asia/Shanghai')
         dt       = datetime.strptime(activity["StartTime"], "%Y-%m-%d %H:%M:%S")
-        dt.replace(tzinfo=timezone)
-        s_time  = dt.timestamp()
+        dt2      = datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, tzinfo=timezone)
+        s_time  = dt2.timestamp()
         mk_time = int(s_time) * 1000
         need_sync = True
         for item in data:
