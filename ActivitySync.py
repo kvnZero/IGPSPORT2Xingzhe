@@ -26,7 +26,6 @@ def syncData(username, password):
     }
     session = requests.session()
     res     = session.post(url, data, headers=headers)
-    result  = json.loads(res.text, strict=False)
 
     # get igpsport list
     url = "https://my.igpsport.com/Activity/ActivityList"
@@ -36,21 +35,22 @@ def syncData(username, password):
     activities   = result["item"]
 
     # login xingzhe account
-    url = "https://www.imxingzhe.com/user/login"
-    res     = session.get(url, headers=headers)
+    url     = "https://www.imxingzhe.com/user/login"
+    res     = session.get(url, headers=headers) # need flush cookie
     cookie  = session.cookies.get_dict()
-    rd = cookie['rd']
-    safe_password = password + ';' + rd
-    encrypter_public_key = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDmuQkBbijudDAJgfffDeeIButq\nWHZvUwcRuvWdg89393FSdz3IJUHc0rgI/S3WuU8N0VePJLmVAZtCOK4qe4FY/eKm\nWpJmn7JfXB4HTMWjPVoyRZmSYjW4L8GrWmh51Qj7DwpTADadF3aq04o+s1b8LXJa\n8r6+TIqqL5WUHtRqmQIDAQAB\n-----END PUBLIC KEY-----\n"
-    safe_password = encrpt(safe_password, encrypter_public_key)
-    url = "https://www.imxingzhe.com/api/v4/account/login"
-    data = {
+    rd      = cookie['rd']
+
+    safe_password           = password + ';' + rd
+    encrypter_public_key    = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDmuQkBbijudDAJgfffDeeIButq\nWHZvUwcRuvWdg89393FSdz3IJUHc0rgI/S3WuU8N0VePJLmVAZtCOK4qe4FY/eKm\nWpJmn7JfXB4HTMWjPVoyRZmSYjW4L8GrWmh51Qj7DwpTADadF3aq04o+s1b8LXJa\n8r6+TIqqL5WUHtRqmQIDAQAB\n-----END PUBLIC KEY-----\n"
+    safe_password           = encrpt(safe_password, encrypter_public_key)
+    
+    url     = "https://www.imxingzhe.com/api/v4/account/login"
+    data    = {
         'account': username, 
         'password': safe_password, 
         "source": "web"
     }
-    res     = session.post(url, json.dumps(data),headers=headers)
-    result  = json.loads(res.text, strict=False)
+    res     = session.post(url, json.dumps(data), headers=headers)
 
     # get user info 
     url     = "https://www.imxingzhe.com/api/v4/account/get_user_info/"
@@ -67,38 +67,42 @@ def syncData(username, password):
     sync_data = []
     # get not upload activity
     for activity in activities:
-        timezone = ZoneInfo('Asia/Shanghai')
-        dt       = datetime.strptime(activity["StartTime"], "%Y-%m-%d %H:%M:%S")
-        dt2      = datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, tzinfo=timezone)
-        s_time  = dt2.timestamp()
-        mk_time = int(s_time) * 1000
+        timezone  = ZoneInfo('Asia/Shanghai') # to Shanghai timezero in Gtihub Action env
+        dt        = datetime.strptime(activity["StartTime"], "%Y-%m-%d %H:%M:%S")
+        dt2       = datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, tzinfo=timezone)
+        s_time    = dt2.timestamp()
+        mk_time   = int(s_time) * 1000
         need_sync = True
+
         for item in data:
-            print(item["start_time"], mk_time)
             if item["start_time"] == mk_time:
                 need_sync = False
                 break
         if need_sync:
             sync_data.append(activity)
 
-    #down file
-    upload_url = "https://www.imxingzhe.com/api/v4/upload_fits"
-    for sync_item in sync_data:
-        rid     = sync_item["RideId"]
-        rid     = str(rid)
-
-        print("sync rid:" + rid)
-
-        fit_url = "https://my.igpsport.com/fit/activity?type=0&rideid="+rid
-        res     = session.get(fit_url)
-        result = session.post(upload_url, files={
-            "title": (None, 'ride-0-AutoSync-'+sync_item["StartTime"], None),
-            "device": (None, 3, None), #IGPS
-            "sport": (None, 3, None), #骑行
-            "upload_file_name": (sync_item["StartTime"]+'.fit', res.content, 'application/octet-stream')
-        })
-
     if len(sync_data) == 0:
+
         print("nothing data need sync")
+
+    else:
+
+        #down file
+        upload_url = "https://www.imxingzhe.com/api/v4/upload_fits"
+        for sync_item in sync_data:
+            rid     = sync_item["RideId"]
+            rid     = str(rid)
+
+            print("sync rid:" + rid)
+
+            fit_url = "https://my.igpsport.com/fit/activity?type=0&rideid="+rid
+            res     = session.get(fit_url)
+            result = session.post(upload_url, files={
+                "title": (None, 'ride-0-AutoSync-'+sync_item["StartTime"], None),
+                "device": (None, 3, None), #IGPS
+                "sport": (None, 3, None), #骑行
+                "upload_file_name": (sync_item["StartTime"]+'.fit', res.content, 'application/octet-stream')
+            })
+
 
 activity = syncData(os.getenv("USERNAME"), os.getenv("PASSWORD"))
