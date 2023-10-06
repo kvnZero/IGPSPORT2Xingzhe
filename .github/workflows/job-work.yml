@@ -22,8 +22,8 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: run srcipt
-      run: |
-        python ActivitySync.py ${{ vars.USERNAME }} ${{ vars.PASSWORD }}
       env:
-        USERNAME: ${{ vars.USERNAME }}
-        PASSWORD: ${{ vars.PASSWORD }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+      run: |
+        python ActivitySync.py
