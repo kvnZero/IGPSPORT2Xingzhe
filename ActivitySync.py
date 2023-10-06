@@ -1,6 +1,6 @@
 import base64
 import time
-import sys
+import os
 import requests, json
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5
@@ -95,5 +95,4 @@ def syncData(username, password):
         })
 
 
-argv = sys.argv
-activity = syncData(argv[1], argv[2])
+activity = syncData(os.getenv("USERNAME"), os.getenv("PASSWORD"))

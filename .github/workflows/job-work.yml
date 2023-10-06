@@ -7,7 +7,7 @@ on:
     types: started
 
 jobs:
-  build:
+  sync:
 
     runs-on: ubuntu-latest
 
@@ -21,9 +21,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: git pull code
-      run: |
-        git pull
     - name: run srcipt
       run: |
         python ActivitySync.py ${{ vars.USERNAME }} ${{ vars.PASSWORD }}
+      env:
+        USERNAME: ${{ vars.USERNAME }}
+        PASSWORD: ${{ vars.PASSWORD }}
