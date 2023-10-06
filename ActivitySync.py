@@ -70,12 +70,12 @@ def syncData(username, password):
         mk_time = int(time.mktime(s_time)) * 1000
         need_sync = True
         for item in data:
+            print(item["start_time"], mk_time)
             if item["start_time"] == mk_time:
                 need_sync = False
                 break
         if need_sync:
             sync_data.append(activity)
-            break;
 
     #down file
     upload_url = "https://www.imxingzhe.com/api/v4/upload_fits"
@@ -94,5 +94,7 @@ def syncData(username, password):
             "upload_file_name": (sync_item["StartTime"]+'.fit', res.content, 'application/octet-stream')
         })
 
+    if len(sync_data) == 0:
+        print("nothing data need sync")
 
 activity = syncData(os.getenv("USERNAME"), os.getenv("PASSWORD"))
