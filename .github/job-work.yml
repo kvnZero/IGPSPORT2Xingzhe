@@ -26,4 +26,4 @@ jobs:
         git pull
     - name: run srcipt
       run: |
-        python ActivitySync.py ${{ vars.username }} ${{ vars.password }}
+        python ActivitySync.py ${{ vars.USERNAME }} ${{ vars.PASSWORD }}
