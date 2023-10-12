@@ -98,7 +98,7 @@ def syncData(username, password):
             fit_url = "https://my.igpsport.com/fit/activity?type=0&rideid="+rid
             res     = session.get(fit_url)
             result = session.post(upload_url, files={
-                "title": (None, 'ride-0-AutoSync-'+sync_item["StartTime"], None),
+                "title": (None, 'IGPSPORT-'+sync_item["StartTime"], None),
                 "device": (None, 3, None), #IGPS
                 "sport": (None, 3, None), #骑行
                 "upload_file_name": (sync_item["StartTime"]+'.fit', res.content, 'application/octet-stream')
