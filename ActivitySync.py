@@ -24,8 +24,11 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
     if garmin_password != None:
         type = 2 #garmin
 
+
     # login account
     if type == 2:
+        print("同步佳明数据")
+
         garth.configure(domain="garmin.cn")
         garth.login(garmin_email, garmin_password)
         activities = garth.connectapi(
@@ -33,6 +36,8 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
             params={"activityType": "cycling", "limit": 10, "start": 0, 'excludeChildren': False},
         )
     else:
+        print("同步IGP数据")
+
         url = "https://my.igpsport.com/Auth/Login"
         data = {
             'username': username,
