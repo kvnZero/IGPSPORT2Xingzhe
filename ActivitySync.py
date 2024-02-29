@@ -143,4 +143,4 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
                     "upload_file_name": (sync_item["StartTime"]+'.fit', res.content, 'application/octet-stream')
                 })
 
-activity = syncData(os.getenv("USERNAME"), os.getenv("PASSWORD"), os.getenv("GARMIN_PASSWORD"), os.getenv("GARMIN_PASSWORD"))
+activity = syncData(os.getenv("USERNAME"), os.getenv("PASSWORD"), os.getenv("GARMIN_EMAIL"), os.getenv("GARMIN_PASSWORD"))
