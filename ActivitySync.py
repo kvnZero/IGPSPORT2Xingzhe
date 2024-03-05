@@ -21,7 +21,8 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
 
     session = requests.session()
     type = 1 #default igp
-    if garmin_password != None:
+
+    if garmin_password is not None and garmin_password != '':
         type = 2 #garmin
 
 
