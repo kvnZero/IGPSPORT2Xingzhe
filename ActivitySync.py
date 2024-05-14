@@ -39,7 +39,7 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
     else:
         print("同步IGP数据")
 
-        url = "https://my.igpsport.com/Auth/Login"
+        url = "https://i.igpsport.com/Auth/Login"
         data = {
             'username': username,
             'password': password,
@@ -47,7 +47,7 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
         res = session.post(url, data, headers=headers)
 
         # get igpsport list
-        url = "https://my.igpsport.com/Activity/ActivityList"
+        url = "https://i.igpsport.com/Activity/ActivityList"
         res = session.get(url)
         result = json.loads(res.text, strict=False)
 
@@ -139,7 +139,7 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
                 rid     = str(rid)
                 print("sync rid:" + rid)
 
-                fit_url = "https://my.igpsport.com/fit/activity?type=0&rideid="+rid
+                fit_url = "https://i.igpsport.com/fit/activity?type=0&rideid="+rid
                 res     = session.get(fit_url)
 
                 result = session.post(upload_url, files={
