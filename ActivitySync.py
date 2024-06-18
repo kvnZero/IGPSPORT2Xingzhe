@@ -19,6 +19,10 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
         "Accept-Encoding" : "gzip, deflate",
     }
 
+    igp_host = "my.igpsport.com"
+    if os.getenv("IGPSPORT_REGION") == "global":
+        igp_host = "i.igpsport.com"
+
     session = requests.session()
     type = 1 #default igp
 
@@ -39,7 +43,7 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
     else:
         print("同步IGP数据")
 
-        url = "https://my.igpsport.com/Auth/Login"
+        url = "https://%s/Auth/Login" % igp_host
         data = {
             'username': username,
             'password': password,
@@ -47,7 +51,7 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
         res = session.post(url, data, headers=headers)
 
         # get igpsport list
-        url = "https://my.igpsport.com/Activity/ActivityList"
+        url = "https://%s/Activity/ActivityList" % igp_host
         res = session.get(url)
         result = json.loads(res.text, strict=False)
 
@@ -139,7 +143,7 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
                 rid     = str(rid)
                 print("sync rid:" + rid)
 
-                fit_url = "https://my.igpsport.com/fit/activity?type=0&rideid="+rid
+                fit_url = "https://%s/fit/activity?type=0&rideid=%s" % (igp_host, rid)
                 res     = session.get(fit_url)
 
                 result = session.post(upload_url, files={
