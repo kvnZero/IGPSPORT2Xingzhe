@@ -1,7 +1,7 @@
 annotated-types==0.6.0
 certifi==2023.7.22
 charset-normalizer==2.0.12
-garth==0.4.44
+garth==0.4.47
 idna==3.4
 oauthlib==3.2.2
 pycryptodome==3.19.0
