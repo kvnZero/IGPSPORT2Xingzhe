@@ -13,6 +13,7 @@ def encrpt(password, public_key):
 
 def syncData(garmin_email, garmin_password):
     if garmin_password is None or garmin_password == '':
+        print("未设置账号密码，跳过脚本")
         return
 
     global_garth = Client()
