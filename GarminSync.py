@@ -17,7 +17,7 @@ def syncData(garmin_email, garmin_password):
     garth = Client()
 
     garth.configure(domain="garmin.cn")
-
+    print(garmin_email)
     # try:
 
     garth.login(garmin_email, garmin_password)
