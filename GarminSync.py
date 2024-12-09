@@ -11,22 +11,22 @@ def encrpt(password, public_key):
     cipher = PKCS1_v1_5.new(rsa)
     return base64.b64encode(cipher.encrypt(password.encode())).decode()
 
-def syncData(garmin_email = None, garmin_password = None):
+def syncData(garmin_email, garmin_password):
 
     global_garth = Client()
     garth = Client()
 
     garth.configure(domain="garmin.cn")
 
-    try:
+    # try:
 
-        garth.login(garmin_email, garmin_password)
-        global_garth.login(garmin_email, garmin_password)
+    garth.login(garmin_email, garmin_password)
+    global_garth.login(garmin_email, garmin_password)
 
-    except Exception:
-        print(Exception)
-        print("登录态失败")
-        return False
+    # except Exception:
+    #     print(Exception)
+    #     print("登录态失败")
+    #     return False
 
     global_activities = global_garth.connectapi(
         f"/activitylist-service/activities/search/activities",
