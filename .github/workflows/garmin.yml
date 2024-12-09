@@ -23,7 +23,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: run script
       env:
-        GARMIN_EMAIL: ${{ secrets.GARMIN_RUN_EMAIL }}
-        GARMIN_PASSWORD: ${{ secrets.GARMIN_RUN_PASSWORD }}
+        GARMIN_RUN_EMAIL: ${{ secrets.GARMIN_RUN_EMAIL }}
+        GARMIN_RUN_PASSWORD: ${{ secrets.GARMIN_RUN_PASSWORD }}
       run: |
         python GarminSync.py
