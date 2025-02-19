@@ -24,7 +24,7 @@ def syncData(garmin_email, garmin_password):
     try:
         garth.login(garmin_email, garmin_password)
         global_garth.login(garmin_email, garmin_password)
-    except Exception,e:
+    except Exception as e:
         print("登录态失败")
         print(e)
         return False
