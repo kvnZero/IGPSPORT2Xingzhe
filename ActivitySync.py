@@ -58,34 +58,26 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
         activities = result["item"]
 
     # login xingzhe account
-    url     = "https://www.imxingzhe.com/user/login"
-    res     = session.get(url, headers=headers) # need flush cookie
-    cookie  = session.cookies.get_dict()
-    rd      = cookie['rd']
-
-    safe_password           = password + ';' + rd
     encrypter_public_key    = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDmuQkBbijudDAJgfffDeeIButq\nWHZvUwcRuvWdg89393FSdz3IJUHc0rgI/S3WuU8N0VePJLmVAZtCOK4qe4FY/eKm\nWpJmn7JfXB4HTMWjPVoyRZmSYjW4L8GrWmh51Qj7DwpTADadF3aq04o+s1b8LXJa\n8r6+TIqqL5WUHtRqmQIDAQAB\n-----END PUBLIC KEY-----\n"
-    safe_password           = encrpt(safe_password, encrypter_public_key)
+    safe_password           = encrpt(password, encrypter_public_key)
     
-    url     = "https://www.imxingzhe.com/api/v4/account/login"
+    url     = "https://www.imxingzhe.com/api/v1/user/login/"
     data    = {
         'account': username, 
         'password': safe_password, 
-        "source": "web"
     }
-    res     = session.post(url, json.dumps(data), headers=headers)
-
-    # get user info 
-    url     = "https://www.imxingzhe.com/api/v4/account/get_user_info/"
-    res     = session.get(url, headers=headers)
+    res     = session.post(url, json=data, headers=headers)
+    if res.status_code != 200:
+        print("行者登录失败")
+        return False
     result  = json.loads(res.text, strict=False)
-    userId  = result["userid"]
+    print("用户名:%s" % result['data']['username'])
 
     # get current month data
-    url     = "https://www.imxingzhe.com/api/v4/user_month_info/?user_id="+str(userId)
+    url     = "https://www.imxingzhe.com/api/v1/pgworkout/?offset=0&limit=10&sport=3&year=&month="
     res     = session.get(url, headers=headers)
     result  = json.loads(res.text, strict=False)
-    data  = result["data"]["wo_info"]
+    data  = result["data"]["data"]
 
     sync_data = []
     # get not upload activity
