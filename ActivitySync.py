@@ -7,6 +7,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5
 import garth
 import zipfile
+import hashlib
 
 def encrpt(password, public_key):
     rsa = RSA.importKey(public_key)
@@ -110,7 +111,7 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
 
     else:
         #down file
-        upload_url = "https://www.imxingzhe.com/api/v4/upload_fits"
+        upload_url = "https://www.imxingzhe.com/api/v1/fit/upload/"
         for sync_item in sync_data:
             if type == 2:  # garmin
                 rid     = sync_item['activityId']
@@ -124,11 +125,14 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
                 with zipfile.ZipFile(rid+".zip", 'r') as zip_ref:
                     zip_ref.extractall(rid)
                 with open(rid+"/"+rid+"_ACTIVITY.fit", 'rb') as fd:
+                    data = fd.read()
                     result = session.post(upload_url, files={
-                        "title": (None, 'Garmin-'+sync_item["startTimeLocal"], None),
-                        "device": (None, 6, None), #IGPS
-                        "sport": (None, 3, None), #骑行
-                        "upload_file_name": (rid+"_ACTIVITY.fit", fd.read(), 'application/octet-stream')
+                        "file_source": (None, "undefined", None),
+                        "fit_filename": (None, rid+"_ACTIVITY.fit", None),
+                        "md5": (None, hashlib.md5(data).hexdigest(), None),
+                        "name": (None, 'Garmin-' + sync_item["startTimeLocal"], None),
+                        "sport": (None, 3, None),  # 骑行
+                        "fit_file": (rid+"_ACTIVITY.fit", data, 'application/octet-stream')
                     })
             else:
                 rid     = sync_item["RideId"]
@@ -139,10 +143,12 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
                 res     = session.get(fit_url)
 
                 result = session.post(upload_url, files={
-                    "title": (None, 'IGPSPORT-'+sync_item["StartTime"], None),
-                    "device": (None, 3, None), #IGPS
-                    "sport": (None, 3, None), #骑行
-                    "upload_file_name": (sync_item["StartTime"]+'.fit', res.content, 'application/octet-stream')
+                    "file_source": (None, "undefined", None),
+                    "fit_filename": (None, sync_item["StartTime"]+'.fit', None),
+                    "md5": (None, hashlib.md5(res.content).hexdigest(), None),
+                    "name": (None, 'IGPSPORT-'+sync_item["StartTime"], None),
+                    "sport": (None, 3, None),  # 骑行
+                    "fit_file": (sync_item["StartTime"]+'.fit', res.content, 'application/octet-stream')
                 })
 
 activity = syncData(os.getenv("USERNAME"), os.getenv("PASSWORD"), os.getenv("GARMIN_EMAIL"), os.getenv("GARMIN_PASSWORD"))
