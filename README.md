@@ -3,7 +3,7 @@
 
 - [功能说明和操作流程说明](https://abigeater.com/archives/511)
 - 支持把佳明数据同步到行者
-- 支持国际版IGPSPORT
+- <del>支持国际版IGPSPORT</del>（igp更新了版本 需要适配)
 - [2025/02/20]更新登录密码算法，请Fork的拉取一下代码（别光Fork呀点点Star，球球了）
 
 # 佳明大陆区同步跑步数据到国际区(GarminSync.py)
