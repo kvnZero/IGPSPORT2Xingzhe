@@ -8,6 +8,7 @@ from Crypto.Cipher import PKCS1_v1_5
 import garth
 import zipfile
 import hashlib
+import re
 
 def encrpt(password, public_key):
     rsa = RSA.importKey(public_key)
@@ -23,6 +24,8 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
     igp_host = "my.igpsport.com"
     if os.getenv("IGPSPORT_REGION") == "global":
         igp_host = "i.igpsport.com"
+        print("国际版暂时不支持")
+        return False
 
     session = requests.session()
     type = 1 #default igp
@@ -50,10 +53,19 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
             'password': password,
         }
         res = session.post(url, data, headers=headers)
-
+        setCookieValue = res.headers.get('Set-Cookie')
+        if(setCookieValue.find("loginTicket") == -1):
+            print("登录失败")
+            return False
+        loginToken = re.search(r'loginToken=(.*?);', setCookieValue).group(1)
+        if(loginToken == None):
+            print("登录失败")
+            return False
+        headers['Authorization'] = "Bearer %s" % loginToken
+        session.headers.update(headers)
         # get igpsport list
         url = "https://%s/Activity/ActivityList" % igp_host
-        res = session.get(url)
+        res = session.get(url, headers=headers)
         result = json.loads(res.text, strict=False)
 
         activities = result["item"]
@@ -139,9 +151,22 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
                 rid     = str(rid)
                 print("sync rid:" + rid)
 
-                fit_url = "https://%s/fit/activity?type=0&rideid=%s" % (igp_host, rid)
-                res     = session.get(fit_url)
 
+                fit_json = "https://prod.zh.igpsport.com/service/web-gateway/web-analyze/activity/queryActivityDetail/%s" % rid
+                res = session.get(fit_json)
+                json_result = json.loads(res.text, strict=False)
+                #判断是否存在fitUrl
+                if 'data' in json_result:
+                    if 'fitUrl' in json_result['data']:
+                        fit_url = json_result['data']['fitUrl']
+                    else:
+                        print("fitUrl not found")
+                        continue
+                else:
+                    print("data not found")
+                    continue
+
+                res     = session.get(fit_url)
                 result = session.post(upload_url, files={
                     "file_source": (None, "undefined", None),
                     "fit_filename": (None, sync_item["StartTime"]+'.fit', None),
@@ -150,5 +175,7 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
                     "sport": (None, 3, None),  # 骑行
                     "fit_file": (sync_item["StartTime"]+'.fit', res.content, 'application/octet-stream')
                 })
+
+            print("sync result:" + result.text)
 
 activity = syncData(os.getenv("USERNAME"), os.getenv("PASSWORD"), os.getenv("GARMIN_EMAIL"), os.getenv("GARMIN_PASSWORD"))
