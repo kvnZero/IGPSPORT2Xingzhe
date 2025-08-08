@@ -152,20 +152,16 @@ def syncData(username, password, garmin_email = None, garmin_password = None):
                 print("sync rid:" + rid)
 
 
-                fit_json = "https://prod.zh.igpsport.com/service/web-gateway/web-analyze/activity/queryActivityDetail/%s" % rid
+                fit_json = "https://prod.zh.igpsport.com/service/web-gateway/web-analyze/activity/getDownloadUrl/%s" % rid
                 res = session.get(fit_json)
                 json_result = json.loads(res.text, strict=False)
                 #判断是否存在fitUrl
                 if 'data' in json_result:
-                    if 'fitUrl' in json_result['data']:
-                        fit_url = json_result['data']['fitUrl']
-                    else:
-                        print("fitUrl not found")
-                        continue
+                    fit_url = json_result['data']
                 else:
                     print("data not found")
                     continue
-
+                
                 res     = session.get(fit_url)
                 result = session.post(upload_url, files={
                     "file_source": (None, "undefined", None),
